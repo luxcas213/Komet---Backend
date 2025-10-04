@@ -1,4 +1,4 @@
-import { fetchEarthquakeData } from "./getData.js";
+import { fetchEarthquakeData, fetchEarthState } from "../services/getdata.js";
 
 function energyToMagnitude(energyJ) {
   return (2 / 3) * (Math.log10(energyJ) - 4.8);
@@ -117,5 +117,62 @@ export async function getDirectImpact(req, res) {
   } catch (err) {
     console.error("Error en getDirectImpact:", err.message);
     res.status(500).json({ error: "Error interno al consultar USGS." });
+  }
+}
+
+export async function getEarthState(req, res) {
+  try {
+    const { date } = req.query;
+    
+    if (!date) {
+      return res.status(400).json({ 
+        error: "Falta parámetro requerido: date (formato: YYYY-MM-DD HH:mm)" 
+      });
+    }
+
+    const rawData = await fetchEarthState(date);
+    
+    const vecResult = rawData.vectorData.result;
+    const vecDataSection = vecResult.split("$$SOE")[1].split("$$EOE")[0].trim();
+    const vecDataArray = vecDataSection.split(/\s+/);
+    
+    const x = parseFloat(vecDataArray[2]);
+    const y = parseFloat(vecDataArray[3]);
+    const z = parseFloat(vecDataArray[4]);
+    const vx = parseFloat(vecDataArray[5]);
+    const vy = parseFloat(vecDataArray[6]);
+    const vz = parseFloat(vecDataArray[7]);
+
+    const obsResult = rawData.observerData.result;
+    const obsDataSection = obsResult.split("$$SOE")[1].split("$$EOE")[0].trim();
+    const obsDataArray = obsDataSection.split(/\s+/);
+    
+    const subsolarLon = parseFloat(obsDataArray[3]);
+    const subsolarLat = parseFloat(obsDataArray[4]);
+
+    const earthState = {
+      type: "earth_state",
+      input: {
+        date: date
+      },
+      data: {
+        position_km: [x, y, z],
+        velocity_kms: [vx, vy, vz],
+        subsolar_lon_deg: subsolarLon,
+        subsolar_lat_deg: subsolarLat
+      },
+      metadata: {
+        timestamp: new Date().toISOString(),
+        source: "NASA JPL Horizons API"
+      }
+    };
+
+    res.json(earthState);
+  } catch (err) {
+    console.error("Error en getEarthState:", err.message);
+    res.status(500).json({ 
+      error: "Error interno al consultar NASA JPL Horizons API.",
+      details: err.message 
+    });
   }
 }
