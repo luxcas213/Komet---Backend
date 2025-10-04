@@ -29,20 +29,31 @@ export async function getAirburst(req, res) {
       new Date().toISOString().split("T")[0],
       20
     );
-
-    return res.json({
-      type: "airburst",
-      input: { latitude, longitude, energy, Mw },
-      resultCount: data.metadata.count,
-      earthquakes: data.features.map((f) => ({
-        id: f.id,
-        magnitude: f.properties.mag,
-        place: f.properties.place,
-        depth_km: f.geometry.coordinates[2],
-        time: new Date(f.properties.time).toISOString(),
-        url: f.properties.url,
-      })),
-    });
+    const rawData = data.features;
+    const filteredData = {};
+    filteredData.type = "airburst";
+    filteredData.input = { latitude, longitude, energy, Mw };
+    filteredData.resultCount = data.metadata.count;
+    filteredData.earthquakes = [];
+    for (const feature of rawData) {
+      const properties = feature.properties;
+      const geometry = feature.geometry;
+      filteredData.earthquakes.push({
+        id: feature.id,
+        geometry: geometry,
+        alert: properties.alert,
+        cdi: properties.cdi,
+        felt: properties.felt,
+        magnitude: properties.mag,
+        mmi: properties.mmi,
+        place: properties.place,
+        sig: properties.sig,
+        tsunami: properties.tsunami,
+        time: new Date(properties.time).toISOString(),
+        url: properties.url,
+      });
+    }
+    res.json(filteredData);
   } catch (err) {
     console.error("Error en getAirburst:", err.message);
     res.status(500).json({ error: "Error interno al consultar USGS." });
@@ -75,19 +86,34 @@ export async function getDirectImpact(req, res) {
       20
     );
 
-    return res.json({
-      type: "directimpact",
-      input: { latitude, longitude, energy, Mw },
-      resultCount: data.metadata.count,
-      earthquakes: data.features.map((f) => ({
-        id: f.id,
-        magnitude: f.properties.mag,
-        place: f.properties.place,
-        depth_km: f.geometry.coordinates[2],
-        time: new Date(f.properties.time).toISOString(),
-        url: f.properties.url,
-      })),
-    });
+    const rawData = data.features;
+    const filteredData = {};
+    filteredData.type = "directImpact";
+    filteredData.input = { latitude, longitude, energy, Mw };
+    filteredData.resultCount = data.metadata.count;
+    filteredData.earthquakes = [];
+    
+    for (const feature of rawData) {
+      console.log(feature);
+      const properties = feature.properties;
+      const geometry = feature.geometry;
+
+      filteredData.earthquakes.push({
+        id: feature.id,
+        geometry: geometry,
+        alert: properties.alert,
+        cdi: properties.cdi,
+        felt: properties.felt,
+        magnitude: properties.mag,
+        mmi: properties.mmi,
+        place: properties.place,
+        sig: properties.sig,
+        tsunami: properties.tsunami,
+        time: new Date(properties.time).toISOString(),
+        url: properties.url,
+      });
+    }
+    res.json(filteredData);
   } catch (err) {
     console.error("Error en getDirectImpact:", err.message);
     res.status(500).json({ error: "Error interno al consultar USGS." });
