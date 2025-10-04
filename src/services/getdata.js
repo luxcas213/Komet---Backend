@@ -15,4 +15,30 @@ export const fetchAsteroidById = async (id) => {
   return response.data;
 };
 
-
+export async function fetchEarthquakeData(
+  minMag,
+  maxMag,
+  latitude,
+  longitude,
+  radiusKm,
+  startTime,
+  endTime,
+  limit
+) {
+  const params = {
+    format: "geojson",
+    starttime: startTime,
+    endtime: endTime,
+    minmagnitude: minMag,
+    maxmagnitude: maxMag,
+    latitude,
+    longitude,
+    maxradiuskm: radiusKm,
+    orderby: "magnitude",
+    limit,
+  };
+  
+  const USGS_API_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query";
+  const response = await axios.get(USGS_API_URL, { params });
+  return response.data;
+}
