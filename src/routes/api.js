@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { getAsteroids } from "../controllers/meteor.js";
+import { getAsteroids,getAsteroidById } from "../controllers/meteor.js";
 const router = Router();
 
 router.get("", (req, res) => {
-  res.send("¡akjhskjhak!");
+  res.send("api api api!");
 });
 
 router.get("/asteroids", getAsteroids);
+router.get("/asteroids/:id", getAsteroidById);
 export default router;
