@@ -1,5 +1,4 @@
-import { fetchEarthquakeData } from "./getData.js";
-
+import {fetchEarthquakeData} from "../services/getdata.js";
 function energyToMagnitude(energyJ) {
   return (2 / 3) * (Math.log10(energyJ) - 4.8);
 }
