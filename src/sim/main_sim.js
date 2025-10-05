@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Asteroid } from './asteroid/asteroid.js';
-import { log, startLog } from './log.js';
+import { log } from './log.js';
 
 export class Simulation {
     #vel_init; #pos_init; #mass;
@@ -31,14 +31,13 @@ export function main_sim(velocityObj, positionObj, mass){
     const sim = new Simulation(velocity, position, mass); // Pass Vector3 objects to constructor
     let as = sim.createAsteroid(velocity, position, mass);
     let time = 500;
-    startLog();
+    let logData = [];
     while(time > 0){
-        log(as);
+        logData.push(log(as));
         as.updateMovement(new THREE.Vector3(0, 0, 0), 1); // no forces, 1 second timestep    
         time--; // decrement time
     }
-
-    return converge;
+    return {converge, logData};
 }
 
 // Only run main_sim when file is executed directly, not when imported

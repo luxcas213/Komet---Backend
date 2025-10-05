@@ -8,13 +8,33 @@ GET {{baseUrl}}
 
 ###
 # 1. Start a new simulation
-POST {{baseUrl}}/runsimulation?vx=1000&vy=500&vz=0&dx=50000&dy=10000&dz=0&mass=1000000
+POST {{baseUrl}}/runsimulation
 Content-Type: application/json
+
+{
+    "vx": 1000,
+    "vy": 500,
+    "vz": 0,
+    "dx": 50000,
+    "dy": 10000,
+    "dz": 0,
+    "mass": 1000000
+}
 
 ###
 # 2. Start another simulation with different parameters
-POST {{baseUrl}}/runsimulation?vx=2000&vy=1000&vz=500&dx=75000&dy=25000&dz=5000&mass=500000
+POST {{baseUrl}}/runsimulation
 Content-Type: application/json
+
+{
+    "vx": 2000,
+    "vy": 1000,
+    "vz": 500,
+    "dx": 75000,
+    "dy": 25000,
+    "dz": 5000,
+    "mass": 500000
+}
 
 ###
 # 3. Start a third simulation
