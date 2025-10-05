@@ -1,6 +1,6 @@
 ### API Testing for Simulation Endpoints
 ### Base URL (adjust if needed)
-@baseUrl = http://localhost:3000/api
+@baseUrl = http://localhost:4000/api
 
 ###
 # Test basic API
@@ -56,3 +56,6 @@ GET {{baseUrl}}/simulationresults?id=3
 ###
 # 7. Check queue status (debugging endpoint)
 GET {{baseUrl}}/simulationqueue
+
+### 
+GET {{baseUrl}}/asteroidsimdata/54296533
