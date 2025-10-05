@@ -1,0 +1,61 @@
+### API Testing for Simulation Endpoints
+### Base URL (adjust if needed)
+@baseUrl = http://localhost:4000/api
+
+###
+# Test basic API
+GET {{baseUrl}}
+
+###
+# 1. Start a new simulation
+POST {{baseUrl}}/runsimulation
+Content-Type: application/json
+
+{
+    "vx": 1000,
+    "vy": 500,
+    "vz": 0,
+    "dx": 50000,
+    "dy": 10000,
+    "dz": 0,
+    "mass": 1000000
+}
+
+###
+# 2. Start another simulation with different parameters
+POST {{baseUrl}}/runsimulation
+Content-Type: application/json
+
+{
+    "vx": 2000,
+    "vy": 1000,
+    "vz": 500,
+    "dx": 75000,
+    "dy": 25000,
+    "dz": 5000,
+    "mass": 500000
+}
+
+###
+# 3. Start a third simulation
+POST {{baseUrl}}/runsimulation?vx=1500&vy=750&vz=250&dx=100000&dy=50000&dz=10000&mass=750000
+Content-Type: application/json
+
+###
+# 4. Check simulation results - ID 1
+GET {{baseUrl}}/simulationresults?id=1
+
+###
+# 5. Check simulation results - ID 2
+GET {{baseUrl}}/simulationresults?id=2
+
+###
+# 6. Check simulation results - ID 3
+GET {{baseUrl}}/simulationresults?id=3
+
+###
+# 7. Check queue status (debugging endpoint)
+GET {{baseUrl}}/simulationqueue
+
+### 
+GET {{baseUrl}}/asteroidsimdata/54551098

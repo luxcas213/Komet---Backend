@@ -4,6 +4,7 @@ export const fetchAsteroids = async () => {
   const apiKey = process.env.NASA_API_KEY;
   const baseUrl = process.env.NASA_BASE_URL;
   const url = `${baseUrl}&api_key=${apiKey}`;
+  
   const response = await axios.get(url);
   return response.data;
 };
@@ -11,11 +12,12 @@ export const fetchAsteroids = async () => {
 export const fetchAsteroidById = async (id) => {
   const apiKey = process.env.NASA_API_KEY;
   const url = `https://api.nasa.gov/neo/rest/v1/neo/${id}?api_key=${apiKey}`;
+  
   const response = await axios.get(url);
   return response.data;
 };
 
-export async function fetchEarthquakeData(
+export const fetchEarthquakeData = async (
   minMag,
   maxMag,
   latitude,
@@ -24,9 +26,11 @@ export async function fetchEarthquakeData(
   startTime,
   endTime,
   limit
-) {
+) => {
+  const USGS_API_URL = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
+  
   const params = {
-    format: "geojson",
+    format: 'geojson',
     starttime: startTime,
     endtime: endTime,
     minmagnitude: minMag,
@@ -34,11 +38,10 @@ export async function fetchEarthquakeData(
     latitude,
     longitude,
     maxradiuskm: radiusKm,
-    orderby: "magnitude",
+    orderby: 'magnitude',
     limit,
   };
-  
-  const USGS_API_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query";
+
   const response = await axios.get(USGS_API_URL, { params });
   return response.data;
-}
+};
