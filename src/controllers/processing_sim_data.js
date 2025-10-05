@@ -18,6 +18,9 @@
 
 export function processingSimData(data, opts = {}) {
   // ---------- options ----------
+
+
+
   const samplesPerCA = opts.samplesPerCloseApproach || 1000; // increase for better matches (slower)
   const BACKPROP_KM = opts.backpropKm || 2_000_000;
   const EARTH_RADIUS_KM = 6371;
@@ -258,6 +261,8 @@ export function processingSimData(data, opts = {}) {
   const cas = data.close_approach_data || [];
 
   for (const ca of cas) {
+    if (ca.orbiting_body !== "Earth") continue;
+    
     // parse numeric fields
     const miss_distance_km = Number(ca.miss_distance_km || ca.miss_distance || 0);
     const relSpeed_kps_fromAPI = ca.relative_velocity_kps ? Number(ca.relative_velocity_kps) : (ca.relative_velocity_kph ? Number(ca.relative_velocity_kph)/3600 : null);

@@ -29,19 +29,21 @@ export function main_sim(velocityObj, positionObj, mass){
     const velocity = new THREE.Vector3(velocityObj.x, velocityObj.y, velocityObj.z);
     const position = new THREE.Vector3(positionObj.x, positionObj.y, positionObj.z);
     
-    velocity.multiplyScalar(100); // convert to km/s
-    position.multiplyScalar(100); // convert to km
+    //velocity.multiplyScalar(.1); // convert to km/s
+    position.multiplyScalar(.1); // convert to km
 
     const sim = new Simulation(velocity, position, mass); // Pass Vector3 objects to constructor
     let as = sim.createAsteroid(velocity, position, mass);
-    let max_iter = 7000;
+    let max_iter = 100000;
     let logData = [];
-    dt = 1
+    let dt = 100
     while(max_iter > 0){
-        if(as.heightAboveEarthSurface() < 1000){ 
-            dt = 0.1;
-        } else if(as.heightAboveEarthSurface() < 100){
-            dt = 0.01;
+        if(as.heightAboveEarthSurface() > 10000){ 
+            dt = 1;
+        }else if(as.heightAboveEarthSurface() > 1000){ 
+            dt = 0.25;
+        } else if(as.heightAboveEarthSurface() > 100){
+            dt = 0.0005;
         }
 
 
@@ -56,14 +58,20 @@ export function main_sim(velocityObj, positionObj, mass){
             converge = true;
             break;
         }
+        
         if(as.breakUpInAtmosphere()){
             console.log("Asteroid has exploded in the atmosphere.");
             converge = true;
             break;
         }
-        const force = as.getGravitationalForce().add(as.atmosphericEntryForces());
+        const force = as.getGravitationalForce()// .add(as.atmosphericEntryForces());
+
         as.updateMovement(force, dt); // apply forces and time step 
         max_iter--; // decrement max_iter
+    }
+    //console.log(logData);
+    if(!converge){
+        console.log("Simulation did not converge within the maximum iterations.");
     }
     return {converge, logData};
 }

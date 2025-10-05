@@ -7,7 +7,7 @@ export class Asteroid {
         this.#velocity = vel;
         this.#position = pos;
         this.#mass = mass;
-        this.#density = density; // in kg/m^3
+        this.#density = 3000;
         this.#acceleration = new THREE.Vector3(0, 0, 0);
     }
     updateMovement(F, delta){ // changes velocity and position
@@ -40,7 +40,7 @@ export class Asteroid {
         const G = 6.67430e-11;
         const earthMass = 5.972e24;
         const distance = this.getDistanceFromEarth() * 1000; // convert km to m
-        const forceMagnitude = (G * this.#mass * earthMass) / (distance * distance) * 1000; // in kiloNewtons
+        const forceMagnitude = (G * this.#mass * earthMass) / (distance * distance); // in kiloNewtons
         const forceDirection = this.#position.clone().negate().normalize(); // towards Earth's center
         return forceDirection.multiplyScalar(forceMagnitude); // in kiloNewtons
     }
@@ -66,11 +66,11 @@ export class Asteroid {
 
     atmosphericEntryForces() {
         if (this.inEarthAtmosphere()) {
-            const dragCoefficient = 0.47; // Approximate for a sphere
+            const dragCoefficient = 1.5; // Approximate for a sphere
             const airDensity = this.airDensityAtAltitudeKm(this.heightAboveEarthSurface());
             const crossSectionalArea = Math.PI * Math.pow((this.#mass / this.#density), 2/3); 
 
-            const dragForce =  Math.pow(this.#velocity.clone(), 2).multiplyScalar(0.5 * dragCoefficient * airDensity * crossSectionalArea*1000); // in kiloNewtons
+            const dragForce =  this.#velocity.clone().multiplyScalar(0.5 * dragCoefficient * airDensity * crossSectionalArea * this.#velocity.length());
             // dragForce.negate(); // Drag force opposes motion
             const terminalVelocity = Math.sqrt((2 * this.#mass * 9.81) / (dragCoefficient * airDensity * crossSectionalArea));
             if (this.#velocity.length() > terminalVelocity) {
@@ -96,11 +96,11 @@ export class Asteroid {
         // dt = time step in seconds
         // return true if mass is zero after loss(burnt up)
         if (this.inEarthAtmosphere() && this.#mass > 0) {
-            const massLossRate = this.#density * 0.0001; // Arbitrary mass loss rate
+            const massLossRate = this.#density * 0.001; // Arbitrary mass loss rate
             const airDensity = this.airDensityAtAltitudeKm(this.heightAboveEarthSurface());
-            const loss = airDensity * this.#velocity.length() * massLossRate;
-            this.#mass = this.#mass - loss * dt; 
-            if (this.#mass <= 0) {
+            const loss = airDensity * this.#velocity.length() * massLossRate * this.#mass/this.#density ; // mass loss proportional to air density, velocity, and current mass
+            this.#mass -= loss * dt; // mass loss over the time step 
+            if (this.#mass <= 50) {
                 this.#mass = 0;
                 this.#velocity.set(0, 0, 0); // Stop movement if mass is zero
                 return true;
